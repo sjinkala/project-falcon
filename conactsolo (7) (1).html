@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			Contact Manager
+		</title>
+
+		<style>
+			.input-group {
+				margin-top: 20px;
+				margin-left: 10px;
+				color:black;
+			}
+			#submitButton {
+				margin-top: 15px;
+				margin-left: 10px;
+
+			}
+			.contact-display {
+				border: 1px solid black;
+				width: 300px;
+				margin-top: 5px;
+			}
+			.content-section {
+				display: none;
+			}
+
+			
+			#first {
+			background-color: #8c7373;
+
+			
+			}
+		</style>
+	</head>
+
+	<body id="first">
+		
+		<h2 style="font-family:Palatino Linotype;">Contact Manager</h2>
+			
+		<!-- </h3> -->
+
+		<div id="nav-buttons">
+			<input type="button" value="View/Edit Contact" onclick="showLookUpFields()">
+			<input type="button" value="Add Contact" onclick="showAddContactField()">
+			<input type="button" value="Browse Conacts" onclick="browseContacts()">
+		</div>
+
+		<div id="content-area">
+
+			<div id="create-contact-div" class="content-section">
+
+
+				<div class="input-group">
+					<div class="input-label">
+						first name:
+					</div>
+					<input class="contact-input" id="firstName">
+				</div>
+
+				<div class="input-group">
+					<div class="input-label">
+						last name:
+					</div>
+					<input class="contact-input" id="lastName">
+				</div>
+
+				<div class="input-group">
+					<div class="input-label">
+						email:
+					</div>
+					<input class="contact-input" id="email">
+				</div>
+
+				<div class="input-group">
+					<div class="input-label">
+						phone number:
+					</div>
+					<input class="contact-input" id="phoneNumber">
+				</div>
+
+				<div class="input-group">
+					<div class="input-label">
+						address:
+					</div>
+					<input class="contact-input" id="address">
+				</div>
+					
+				<div>
+
+				<button id="submitButton" onclick="addContact();">
+					Add Contact
+				</button>
+				</div>
+			</div>
+
+			<div id="contact-list-div" class="content-section">
+
+
+			</div>
+
+			<div id="edit-contact-div" class="content-section" >
+
+				<div class="input-group">
+					<div class="input-label">
+						first name:
+					</div>
+					<input class="contact-input" id="edit-firstName">
+				</div>
+
+				<div class="input-group">
+					<div class="input-label">
+						last name:
+					</div>
+					<input class="contact-input" id="edit-lastName">
+				</div>
+
+				<div class="input-group">
+					<div class="input-label">
+						email:
+					</div>
+					<input class="contact-input" id="edit-email">
+				</div>
+
+				<div class="input-group">
+					<div class="input-label">
+						phone number:
+					</div>
+					<input class="contact-input" id="edit-phoneNumber">
+				</div>
+
+				<div class="input-group">
+					<div class="input-label">
+						address:
+					</div>
+					<input class="contact-input" id="edit-address">
+				</div>
+
+				<input type="hidden" id="hidden-input-email">
+
+				<button id="submitEditButton" onclick="updateContact();">
+					Edit Contact
+				</button>
+			</div>
+
+			<div id="contact-lookup-div" class="content-section"> 
+
+				<div class="lookup-input-group">
+					<div class="lookup-input-label">
+						First Name
+					</div>
+					<input class="lookup-contact-input" id="lookup-first-name-input">
+					<button id="lookup-first-name-btn" onclick="lookupByName('lookup-first-name-input', 'first');">
+						Search by First Name
+					</button>
+				</div>
+			</div>
+
+		</div>
+
+
+
+		<script>
+		// Make another function and use document.getElementById just like you did for showLookupFields() but inside the 
+		// function, right before that, use querySelectorAll() to select all of the divs with a class of "content-section"
+		// and then apply the style of display = 'none' to each of those. 
+			function showLookUpFields (){
+				var elsToHide = document.querySelectorAll('.content-section');
+				for (var i = 0; i < elsToHide.length; i++) {
+				 	elsToHide[i].style.display = "none";		
+					//console.log(elsToHide);
+				}
+					document.getElementById('contact-lookup-div').style.display = "initial";		
+			}
+
+
+			function showAddContactField (){
+				var elsToHide = document.querySelectorAll('.content-section');
+				for (var i = 0; i < elsToHide.length; i++) {
+					(elsToHide[i].style.display = "none");
+					console.log(elsToHide);
+				}	
+					document.getElementById('create-contact-div').style.display = "initial";
+				
+			}	
+			// see comment notes:
+			function browseContacts(){
+				// no need to get local storage here, that's done in the loadContacts function
+				var elsToHide = document.querySelectorAll('.content-section');
+				console.log("elsToHide: ", elsToHide);
+				for (var i = 0; i < elsToHide.length; i++) {
+					elsToHide[i].style.display = "none"; // this should not be wrapped in parentheses
+				} // you weren't closing your for loop code block with this curly brace.
+				loadContacts(); // no need to pass any argument to loadContacts
+				document.getElementById('contact-list-div').style.display = "initial"; // initial was misspelled
+			} // you had this closing curly brace that ends this function way down underneath the commented out loadContacts function.
+ 
+// *** BY THE WAY be sure to scroll down and look at the NEW loadContacts function.  I renamed the old one and just made a new one underneath it.  Much more efficient.  Please study the two versions and try to get a feel for how the new one is more efficient.  At the very least make sure that you (after spending time wrapping your head around it of course!) can understand what it's doing/ how it works. 
+
+			function getLocalStorage() {
+				// getting anything that may already be stored in local storage under the key of 'contactsArray'
+				var lsArray = localStorage.getItem('contactsArray');
+				// creating a variable that we'll end up using as the array we'll save back into localStorage
+				var _contactsArray;
+				// check to see if there was anything in localStorage or if not (lsArray is null or undefined) create a new array
+				if (lsArray) {
+					_contactsArray = JSON.parse(lsArray); // if there was something in localStorage then parse it and assign to contactsArray 
+				} else {
+					_contactsArray = []; // if there wasn't anything in localStorage then create an empty array and assign to contactsArray
+				}
+				return _contactsArray;
+			}
+			function addContact () {
+				// next four lines grabbing values from inputs and assigning to variables
+				var firstName = document.getElementById('firstName').value;
+				var lastName = document.getElementById('lastName').value;
+				var email = document.getElementById('email').value;
+				var phoneNumber = document.getElementById('phoneNumber').value;
+				var address = document.getElementById('address').value;
+				// putting those values into an object that represents the contact we want to save
+				var contactToSave = {
+					first_name	: firstName,
+					last_name	: lastName,
+					email		: email,
+					phone_number: phoneNumber,
+					address		: address
+				};
+
+				var contactsArray = getLocalStorage();
+				
+				console.log("contactsArray before adding new contact: ", contactsArray.length.toString()); // REMOVE THIS ============
+				// add our new contact to contactsArray
+				contactsArray.push(contactToSave);
+				// stringify the array so we can save it back to localStorage (which requires item to be saved to be in string format)
+				console.log("contactsArray after adding new contact: ", contactsArray.length.toString()); // REMOVE THIS ============
+				var stringArray = JSON.stringify(contactsArray);
+				// save the stringified array to localStorage	
+				localStorage.setItem('contactsArray', stringArray);
+				// set the values of each input to an empty string
+				document.getElementById('firstName').value = "";
+				document.getElementById('lastName').value = "";
+				document.getElementById('email').value = "";
+				document.getElementById('phoneNumber').value = "";
+				document.getElementById('address').value = "";
+			}
+			function createContactDisplay(contactObj) {
+				var markup =	"<div class='contact-display'>" + 
+									"<p>first name: " + contactObj.first_name + "</p>" +
+									"<p>last name: " + contactObj.last_name + "</p>" +
+									"<p>email address: " + contactObj.email + "</p>" +
+									"<p>phone number: " + contactObj.phone_number + "</p>" +
+									"<p>address: " + contactObj.address + "</p>" +
+									"<button onclick='showEditFields(&quot;" + contactObj.email + "&quot;)'> Edit </button>"
+								"</div>";
+					return markup;
+
+			}
+
+			// deprecated function - see 'loadContacts()' below
+			function oldLoadContacts () {
+				var contactsArray = getLocalStorage();
+				// console.log("contactsArray.length: ", contactsArray.length.toString()); // REMOVE THIS ============
+				for (var i = 0; i < contactsArray.length; i++) {
+					// console.log(contactsArray[i].first_name, contactsArray[i].last_name);
+					var markupToInsert = createContactDisplay(contactsArray[i]);
+					var existingHTML = document.getElementById('contact-list-div').innerHTML;
+					var newHTML = existingHTML + markupToInsert;
+					document.getElementById('contact-list-div').innerHTML = newHTML;
+				}
+			}
+
+			function loadContacts () {
+				var contactsArray = getLocalStorage();
+				var markupToInsert = '';
+				for (var i = 0; i < contactsArray.length; i++) {
+					var singleContactMarkup = createContactDisplay(contactsArray[i]);
+					markupToInsert += singleContactMarkup;
+					
+				}
+				console.log(markupToInsert);
+				document.getElementById('contact-list-div').innerHTML = markupToInsert;
+			}
+
+			function lookupByName(contactInputId, firstLast){
+				var lookupNameValue = document.getElementById(contactInputId).value;
+				//console.log(lookupNameValue); Console works
+				var arrayOfContacts = getLocalStorage();
+				for(var i = 0; i < arrayOfContacts.length; i++) {
+					//console.log(arrayOfContacts[i]);
+					if (arrayOfContacts[i].first_name === lookupNameValue) {
+						var contactMarkup = createContactDisplay(arrayOfContacts[i]);
+						//console.log(contactMarkup);
+						document.getElementById('contact-list-div').innerHTML = contactMarkup
+						document.getElementById('contact-list-div').style.display = "initial"
+					}
+				}
+			}
+
+			function showEditFields(contactEmail){
+				//console.log("contactEmail: ", contactEmail); // =========
+				document.getElementById('edit-contact-div').style.display = "initial";
+				var arrayOfContacts = getLocalStorage();
+				//console.log(arrayOfContacts);
+				for(var i = 0; i < arrayOfContacts.length; i++) {
+					// the next two lines are console logging the items that you are about to compare in the 
+					// following line, your if statement.  
+					// console.log("arrayOfContacts[i].email ", arrayOfContacts[i].email); // =========
+					// console.log("showEditFields: ", showEditFields); // ===========
+					// console.log("arrayofContacts[i]")
+					if (arrayOfContacts[i].email === contactEmail) {
+						// NOTE: this works, but you should put spaces on both sides of your equal signs in javascript.  
+						// In HTML for attributes you don't, but in js you do :)
+						document.getElementById('edit-firstName').value=arrayOfContacts[i].first_name;
+						document.getElementById('edit-lastName').value=arrayOfContacts[i].last_name;
+						document.getElementById('edit-email').value=arrayOfContacts[i].email;
+						document.getElementById('edit-phoneNumber').value=arrayOfContacts[i].phone_number;
+						document.getElementById('edit-address').value=arrayOfContacts[i].address;
+						// inserting the email address into our hidden input, we'll later pull this out to help us 
+						// identify the record in local storage that we want to update. 
+						document.getElementById('hidden-input-email').value = arrayOfContacts[i].email;
+
+					}
+				}
+			}
+
+			// this is our new function that is called when we click on the Edit Contact button (from the onclick attribute of the button)
+			function updateContact() {
+				// email address was of the contact that we want to edit.  When we loop through our contacts in local storage
+				var firstName = document.getElementById('edit-firstName').value;
+				var lastName = document.getElementById('edit-lastName').value;
+				var email = document.getElementById('edit-email').value;
+				var originalEmail = document.getElementById('hidden-input-email').value;
+				var phoneNumber = document.getElementById('edit-phoneNumber').value;
+				var address = document.getElementById('edit-address').value;
+				var arrayOfContacts = getLocalStorage();
+				console.log(arrayOfContacts);
+				for(var i = 0; i < arrayOfContacts.length; i++) {
+					if (arrayOfContacts[i].email === originalEmail);{
+					    arrayOfContacts[i].first_name = firstName;
+						arrayOfContacts[i].last_name = lastName;
+						arrayOfContacts[i].email = email;
+						arrayOfContacts[i].phone_number = phoneNumber;
+						arrayOfContacts[i].address = address;
+						var contactString = JSON.stringify(arrayOfContacts);
+						localStorage.setItem('contactsArray', contactString);
+					}
+				}						
+			}
+			
+				// now we need to get all of the info from our form.  Look at lines 161-165 for an example.
+
+				// then we'll need to once again pull our contacts out of local storage and loop through them looking for the one
+				// that has an email address that matches the value of the hidden input.  This will be similar to what you did on 
+				// lines 235, 237, and 243.  
+
+			
+				
+		</script>
+
+
+
+
+	</body>
+
+</html>
